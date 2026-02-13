@@ -20,7 +20,6 @@ program
     
     if (options.debug) {
       debug.enable('page-loader*');
-      console.error('🐛 Debug mode enabled');
     }
     
     pageLoader(url, options.output)
@@ -29,7 +28,7 @@ program
         process.exit(0);
       })
       .catch((error) => {
-        console.error(error.message);
+        console.error(`\n❌ ${error.message}`);
         
         if (error.code) {
           switch (error.code) {
