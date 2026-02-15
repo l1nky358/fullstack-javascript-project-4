@@ -2,7 +2,7 @@
 
 import { program } from 'commander';
 import debug from 'debug';
-import pageLoader from '../src/index.js';
+import pageLoader from '../src/page-Loader.js';
 
 if (process.env.DEBUG) {
   debug.enable(process.env.DEBUG);
