@@ -2,7 +2,7 @@
 
 import { program } from 'commander';
 import debug from 'debug';
-import pageLoader from '../src/page-Loader.js';
+import pageLoader from '../src/index.js';
 
 if (process.env.DEBUG) {
   debug.enable(process.env.DEBUG);
@@ -29,30 +29,6 @@ program
       })
       .catch((error) => {
         console.error(`\n❌ ${error.message}`);
-        
-        if (error.code) {
-          switch (error.code) {
-            case 'ENOENT':
-              process.exit(2);
-            case 'EACCES':
-              process.exit(3);
-            case 'EEXIST':
-              process.exit(4);
-            case 'ENOTDIR':
-              process.exit(5);
-            case 'ETIMEDOUT':
-            case 'ECONNREFUSED':
-            case 'ENOTFOUND':
-              process.exit(6);
-            default:
-              process.exit(1);
-          }
-        }
-        
-        if (error.statusCode) {
-          process.exit(7);
-        }
-        
         process.exit(1);
       });
   });
