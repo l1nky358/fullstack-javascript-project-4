@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import axios from 'axios';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 import debug from 'debug';
 import { URL } from 'url';
 import { Listr } from 'listr2';
