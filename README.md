@@ -32,7 +32,6 @@ page-loader --debug https://ru.hexlet.io/courses
 
 install:
 	npm ci
-	npm install --save-dev @stylistic/eslint-plugin
 
 test:
 	npm test
