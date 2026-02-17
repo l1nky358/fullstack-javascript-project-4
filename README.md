@@ -3,8 +3,6 @@
 
 # Page Loader
 
-[![Node.js CI](https://github.com/your-username/page-loader/actions/workflows/nodejs.yml/badge.svg)](https://github.com/your-username/page-loader/actions/workflows/nodejs.yml)
-
 Page Loader — утилита командной строки для скачивания веб-страниц вместе со всеми локальными ресурсами с красивым отображением прогресса.
 
 ## ✨ Возможности
