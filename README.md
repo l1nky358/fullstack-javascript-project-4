@@ -28,3 +28,22 @@ page-loader --output /var/tmp https://ru.hexlet.io/courses
 
 # Режим отладки
 page-loader --debug https://ru.hexlet.io/courses
+
+
+install:
+	npm ci
+	npm install --save-dev @stylistic/eslint-plugin
+
+test:
+	npm test
+
+test-coverage:
+	npm run test:coverage
+
+lint:
+	npx eslint .
+
+lint-fix:
+	npx eslint . --fix
+
+.PHONY: test
