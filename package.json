@@ -19,7 +19,15 @@
     "listr2": "^6.6.1"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@vitest/coverage-v8": "^4.0.18",
+=======
+    "@eslint/js": "^8.57.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "eslint": "^8.57.0",
+    "eslint-plugin-import": "^2.29.0",
+    "globals": "^13.24.0",
+>>>>>>> 68c564d5d8345a2a4bf78c8547a136636ba085a4
     "nock": "^13.3.0",
     "vitest": "^4.0.18"
   },
