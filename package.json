@@ -21,12 +21,12 @@
     "listr2": "^6.6.1"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^0.34.0",
+    "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.29.0",
     "nock": "^13.3.0",
-    "vitest": "^0.34.0"
+    "vitest": "^4.0.18"
   },
   "engines": {
     "node": ">=16.0.0"
