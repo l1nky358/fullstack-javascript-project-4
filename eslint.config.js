@@ -1,5 +1,6 @@
 import globals from 'globals';
 import js from '@eslint/js';
+import stylistic from '@stylistic/eslint-plugin';
 import importPlugin from 'eslint-plugin-import';
 
 export default [
@@ -16,6 +17,7 @@ export default [
     },
     plugins: {
       import: importPlugin,
+      '@stylistic': stylistic,
     },
     rules: {
       'no-console': 'off',
