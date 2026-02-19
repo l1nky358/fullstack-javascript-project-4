@@ -26,21 +26,3 @@ page-loader --output /var/tmp https://ru.hexlet.io/courses
 
 # Режим отладки
 page-loader --debug https://ru.hexlet.io/courses
-
-
-install:
-	npm ci
-
-test:
-	npm test
-
-test-coverage:
-	npm run test:coverage
-
-lint:
-	npm run lint
-
-lint-fix:
-	npm run lint:fix
-
-.PHONY: test lint lint-fix
