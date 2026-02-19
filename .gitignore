@@ -1,6 +1,5 @@
 # Dependency directories
 node_modules/
-package-lock.json
 
 # Coverage directory
 coverage/
@@ -23,3 +22,5 @@ page-loader-*/
 .idea/
 *.swp
 *.swo
+
+package-lock.json/
