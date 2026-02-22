@@ -7,4 +7,10 @@ test:
 test-coverage:
 	npm run test:coverage
 
-.PHONY: test
+lint:
+	npm run lint
+
+lint-fix:
+	npm run lint:fix
+
+.PHONY: test lint lint-fix
