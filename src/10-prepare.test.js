@@ -7,7 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe('entry point', () => {
   it('should export pageLoader function', async () => {
-    const { default: pageLoader } = await import('../src/index.js');
+    const { default: pageLoader } = await import('./index.js');
     expect(pageLoader).toBeDefined();
     expect(typeof pageLoader).toBe('function');
   });

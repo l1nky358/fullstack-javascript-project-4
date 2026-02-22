@@ -17,11 +17,11 @@ program
   .arguments('<url>')
   .action((url) => {
     const options = program.opts();
-    
+
     if (options.debug) {
       debug.enable('page-loader*');
     }
-    
+
     pageLoader(url, options.output)
       .then((filepath) => {
         console.log(filepath);

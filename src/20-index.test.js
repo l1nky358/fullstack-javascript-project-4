@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import pageLoader from '../src/index.js';
+import pageLoader from './index.js';
 
 describe('index', () => {
   it('should export pageLoader function', () => {
