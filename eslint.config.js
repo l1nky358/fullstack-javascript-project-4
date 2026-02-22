@@ -3,19 +3,14 @@ import stylistic from '@stylistic/eslint-plugin';
 export default [
   {
     files: ['**/*.js'],
-    plugins: {
-      '@stylistic': stylistic,
-    },
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
       globals: {
-        // Node.js globals
         console: 'readonly',
         process: 'readonly',
         __dirname: 'readonly',
         __filename: 'readonly',
-        // Jest globals
         describe: 'readonly',
         it: 'readonly',
         test: 'readonly',
@@ -27,16 +22,16 @@ export default [
         jest: 'readonly',
       },
     },
+    plugins: {
+      '@stylistic': stylistic,
+    },
     rules: {
       'no-console': 'off',
-      
       'import/extensions': ['error', 'ignorePackages', { js: 'always' }],
       'import/prefer-default-export': 'off',
-      
       'no-underscore-dangle': 'off',
       'class-methods-use-this': 'off',
       'max-classes-per-file': 'off',
-      
       '@stylistic/indent': ['error', 2],
       '@stylistic/quotes': ['error', 'single'],
       '@stylistic/semi': ['error', 'always'],
