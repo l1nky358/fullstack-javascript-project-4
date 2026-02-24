@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-import { program } from 'commander';
-import debug from 'debug';
-import pageLoader from '../src/index.js';
+import { program } from 'commander'
+import debug from 'debug'
+import pageLoader from '../src/index.js'
 
 if (process.env.DEBUG) {
-  debug.enable(process.env.DEBUG);
+  debug.enable(process.env.DEBUG)
 }
 
 program
@@ -16,21 +16,21 @@ program
   .option('-d, --debug', 'enable debug output', false)
   .arguments('<url>')
   .action((url) => {
-    const options = program.opts();
+    const options = program.opts()
 
     if (options.debug) {
-      debug.enable('page-loader*');
+      debug.enable('page-loader*')
     }
 
     pageLoader(url, options.output)
       .then((filepath) => {
-        console.log(filepath);
-        process.exit(0);
+        console.log(filepath)
+        process.exit(0)
       })
       .catch((error) => {
-        console.error(`\n❌ ${error.message}`);
-        process.exit(1);
-      });
-  });
+        console.error(`\n❌ ${error.message}`)
+        process.exit(1)
+      })
+  })
 
-program.parse();
+program.parse()
