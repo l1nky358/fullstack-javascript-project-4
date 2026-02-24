@@ -36,8 +36,8 @@ const generateFileName = (url) => {
   return urlWithoutProtocol.replace(/[^a-z0-9]/gi, '-')
 }
 
-const generateHtmlFileName = (url) => `${generateFileName(url)}.html`
-const generateFilesDirName = (url) => `${generateFileName(url)}_files`
+const generateHtmlFileName = url => `${generateFileName(url)}.html`
+const generateFilesDirName = url => `${generateFileName(url)}_files`
 
 const getLocalFileName = (resourceUrl, baseUrl) => {
   const fullUrl = new URL(resourceUrl, baseUrl).toString()
@@ -125,12 +125,14 @@ const downloadResource = async (resourceUrl, baseUrl, outputDir) => {
   const fileName = getLocalFileName(resourceUrl, baseUrl)
   const filePath = path.join(outputDir, fileName)
 
-  const response = await axios.get(fullUrl, {
-    responseType: 'arraybuffer',
-    validateStatus: status => status >= 200 && status < 400,
-    timeout: 10000,
-    maxRedirects: 5,
-  })
+  const response = await axios.get(url, {
+  validateStatus: (status) => status >= 200 && status < 400,
+  timeout: 30000,
+  maxRedirects: 5,
+  headers: {
+    'User-Agent': 'Page-Loader/1.0.0',
+  },
+}).catch((error) => {
 
   await fs.writeFile(filePath, response.data)
   return fileName
