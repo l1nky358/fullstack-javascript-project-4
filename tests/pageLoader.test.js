@@ -3,7 +3,7 @@ import path from 'path'
 import os from 'os'
 import nock from 'nock'
 import {
-  beforeEach, afterEach, describe, expect, test
+  beforeEach, afterEach, describe, expect, test,
 } from '@jest/globals'
 import pageLoader from '../src/pageLoader.js'
 
@@ -27,11 +27,11 @@ describe('Page Loader - Error Handling', () => {
       'example.com',
       'http://',
       'https://',
-      ''
+      '',
     ]
 
     await Promise.all(
-      invalidUrls.map((url) => expect(pageLoader(url, tempDir)).rejects.toThrow(/Invalid URL/))
+      invalidUrls.map(url => expect(pageLoader(url, tempDir)).rejects.toThrow(/Invalid URL/)),
     )
   })
 
@@ -78,7 +78,7 @@ describe('Page Loader - Error Handling', () => {
       .get('/')
       .replyWithError({
         code: 'ENOTFOUND',
-        message: 'getaddrinfo ENOTFOUND non-existent-domain.com'
+        message: 'getaddrinfo ENOTFOUND non-existent-domain.com',
       })
 
     await expect(pageLoader(url, tempDir))
@@ -93,7 +93,7 @@ describe('Page Loader - Error Handling', () => {
       .get('/')
       .replyWithError({
         code: 'ECONNREFUSED',
-        message: 'connect ECONNREFUSED 93.184.216.34:81'
+        message: 'connect ECONNREFUSED 93.184.216.34:81',
       })
 
     await expect(pageLoader(url, tempDir))
@@ -108,7 +108,7 @@ describe('Page Loader - Error Handling', () => {
       .get('/slow')
       .replyWithError({
         code: 'ETIMEDOUT',
-        message: 'timeout of 5000ms exceeded'
+        message: 'timeout of 5000ms exceeded',
       })
 
     await expect(pageLoader(url, tempDir))
@@ -312,7 +312,7 @@ describe('Page Loader - Error Handling', () => {
     nock('https://example.com')
       .get('/redirect')
       .reply(302, '', {
-        Location: '/final'
+        Location: '/final',
       })
       .get('/final')
       .reply(200, '<html><body>Final page</body></html>')
