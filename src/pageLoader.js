@@ -175,7 +175,7 @@ const pageLoader = async (url, outputDir = process.cwd()) => {
   log(`Starting page-loader for URL: ${url}`);
 
   try {
-    // eslint-disable-next-line no-new
+     
     new URL(url);
   } catch {
     throw new PageLoaderError(
