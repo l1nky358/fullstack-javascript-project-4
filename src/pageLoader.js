@@ -67,7 +67,8 @@ const isLocalResource = (resourceUrl, pageUrl) => {
     const resourceFullUrl = new URL(resourceUrl, pageUrl)
     const pageHost = new URL(pageUrl).host
     return resourceFullUrl.host === pageHost
-  } catch {
+  }
+  catch {
     return false
   }
 }
@@ -82,7 +83,8 @@ const resourceTags = [
 const validateOutputDirectory = async (outputDir) => {
   try {
     await fs.access(outputDir, fs.constants.F_OK)
-  } catch {
+  }
+  catch {
     throw new FileSystemError(
       `Output directory does not exist: ${outputDir}`,
       'ENOENT',
@@ -91,7 +93,8 @@ const validateOutputDirectory = async (outputDir) => {
 
   try {
     await fs.access(outputDir, fs.constants.W_OK)
-  } catch {
+  }
+  catch {
     throw new FileSystemError(
       `No write permission for output directory: ${outputDir}`,
       'EACCES',
@@ -106,7 +109,8 @@ const validateOutputDirectory = async (outputDir) => {
         'ENOTDIR',
       )
     }
-  } catch (error) {
+  }
+  catch (error) {
     if (error.code !== 'ENOENT') {
       throw new FileSystemError(
         `Cannot access output directory: ${error.message}`,
@@ -162,7 +166,8 @@ const processHtml = async (html, baseUrl, resourcesDir, outputDir) => {
       const localPath = path.join(resourcesDir, localFileName)
       $(resource.element).attr(resource.attribute, localPath)
       return { success: true, type: resource.type, url: resource.url }
-    } catch (error) {
+    }
+    catch (error) {
       logError(`Failed to download ${resource.type}: ${resource.url} - ${error.message}`)
       return { success: false, type: resource.type, url: resource.url }
     }
@@ -177,7 +182,8 @@ const pageLoader = async (url, outputDir = process.cwd()) => {
 
   try {
     new URL(url)
-  } catch {
+  }
+  catch {
     throw new PageLoaderError(
       `Invalid URL: ${url}. Please provide a valid URL including protocol (e.g., https://example.com)`,
       'INVALID_URL',
@@ -193,7 +199,7 @@ const pageLoader = async (url, outputDir = process.cwd()) => {
     headers: {
       'User-Agent': 'Page-Loader/1.0.0',
     },
-  }).catch(error => {
+    }).catch(error => {
     if (error.response) {
       throw new NetworkError(
         `Failed to load page: ${error.response.status} ${error.response.statusText}`,
