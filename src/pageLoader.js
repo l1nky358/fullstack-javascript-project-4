@@ -9,7 +9,7 @@ const log = debug('page-loader')
 const logError = debug('page-loader:error')
 
 class PageLoaderError extends Error {
-  constructor(message, code, statusCode = null) {
+  constructor (message, code, statusCode = null) {
     super(message)
     this.name = 'PageLoaderError'
     this.code = code
@@ -18,14 +18,14 @@ class PageLoaderError extends Error {
 }
 
 class NetworkError extends PageLoaderError {
-  constructor(message, code, statusCode = null) {
+  constructor (message, code, statusCode = null) {
     super(message, code, statusCode)
     this.name = 'NetworkError'
   }
 }
 
 class FileSystemError extends PageLoaderError {
-  constructor(message, code) {
+  constructor (message, code) {
     super(message, code)
     this.name = 'FileSystemError'
   }
