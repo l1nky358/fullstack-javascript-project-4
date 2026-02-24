@@ -9,7 +9,7 @@ const log = debug('page-loader')
 const logError = debug('page-loader:error')
 
 class PageLoaderError extends Error {
-  constructor (message, code, statusCode = null) {
+  constructor(message, code, statusCode = null) {
     super(message)
     this.name = 'PageLoaderError'
     this.code = code
@@ -18,26 +18,26 @@ class PageLoaderError extends Error {
 }
 
 class NetworkError extends PageLoaderError {
-  constructor (message, code, statusCode = null) {
+  constructor(message, code, statusCode = null) {
     super(message, code, statusCode)
     this.name = 'NetworkError'
   }
 }
 
 class FileSystemError extends PageLoaderError {
-  constructor (message, code) {
+  constructor(message, code) {
     super(message, code)
     this.name = 'FileSystemError'
   }
 }
 
-const generateFileName = (url) => {
+const generateFileName = url => {
   const urlWithoutProtocol = url.replace(/^https?:\/\//i, '')
   return urlWithoutProtocol.replace(/[^a-z0-9]/gi, '-')
 }
 
-const generateHtmlFileName = (url) => `${generateFileName(url)}.html`
-const generateFilesDirName = (url) => `${generateFileName(url)}_files`
+const generateHtmlFileName = url => `${generateFileName(url)}.html`
+const generateFilesDirName = url => `${generateFileName(url)}_files`
 
 const getLocalFileName = (resourceUrl, baseUrl) => {
   const fullUrl = new URL(resourceUrl, baseUrl).toString()
@@ -78,7 +78,7 @@ const resourceTags = [
   { selector: 'script', attribute: 'src', type: 'script' },
 ]
 
-const validateOutputDirectory = async (outputDir) => {
+const validateOutputDirectory = async outputDir => {
   try {
     await fs.access(outputDir, fs.constants.F_OK)
   } catch {
@@ -122,7 +122,7 @@ const downloadResource = async (resourceUrl, baseUrl, outputDir) => {
 
   const response = await axios.get(fullUrl, {
     responseType: 'arraybuffer',
-    validateStatus: (status) => status >= 200 && status < 400,
+    validateStatus: status => status >= 200 && status < 400,
     timeout: 10000,
     maxRedirects: 5,
   })
@@ -155,7 +155,7 @@ const processHtml = async (html, baseUrl, resourcesDir, outputDir) => {
 
   await fs.mkdir(outputDir, { recursive: true })
 
-  const downloadPromises = resources.map(async (resource) => {
+  const downloadPromises = resources.map(async resource => {
     try {
       const localFileName = await downloadResource(resource.url, baseUrl, outputDir)
       const localPath = path.join(resourcesDir, localFileName)
@@ -186,13 +186,13 @@ const pageLoader = async (url, outputDir = process.cwd()) => {
   await validateOutputDirectory(outputDir)
 
   const response = await axios.get(url, {
-    validateStatus: (status) => status >= 200 && status < 400,
+    validateStatus: status => status >= 200 && status < 400,
     timeout: 30000,
     maxRedirects: 5,
     headers: {
       'User-Agent': 'Page-Loader/1.0.0',
     },
-  }).catch((error) => {
+  }).catch(error => {
     if (error.response) {
       throw new NetworkError(
         `Failed to load page: ${error.response.status} ${error.response.statusText}`,
