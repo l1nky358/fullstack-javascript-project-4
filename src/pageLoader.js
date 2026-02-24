@@ -31,7 +31,7 @@ class FileSystemError extends PageLoaderError {
   }
 }
 
-const generateFileName = url => {
+const generateFileName = (url) => {
   const urlWithoutProtocol = url.replace(/^https?:\/\//i, '')
   return urlWithoutProtocol.replace(/[^a-z0-9]/gi, '-')
 }
@@ -50,7 +50,8 @@ const getLocalFileName = (resourceUrl, baseUrl) => {
   let extension
   if (pathname === '' || pathname === '/') {
     extension = '.html'
-  } else {
+  }
+  else {
     extension = path.extname(pathname.split('?')[0]) || '.html'
   }
 
@@ -78,7 +79,7 @@ const resourceTags = [
   { selector: 'script', attribute: 'src', type: 'script' },
 ]
 
-const validateOutputDirectory = async outputDir => {
+const validateOutputDirectory = (async outputDir) => {
   try {
     await fs.access(outputDir, fs.constants.F_OK)
   } catch {
