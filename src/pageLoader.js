@@ -36,8 +36,8 @@ const generateFileName = (url) => {
   return urlWithoutProtocol.replace(/[^a-z0-9]/gi, '-')
 }
 
-const generateHtmlFileName = url => `${generateFileName(url)}.html`
-const generateFilesDirName = url => `${generateFileName(url)}_files`
+const generateHtmlFileName = (url) => `${generateFileName(url)}.html`
+const generateFilesDirName = (url) => `${generateFileName(url)}_files`
 
 const getLocalFileName = (resourceUrl, baseUrl) => {
   const fullUrl = new URL(resourceUrl, baseUrl).toString()
@@ -50,8 +50,7 @@ const getLocalFileName = (resourceUrl, baseUrl) => {
   let extension
   if (pathname === '' || pathname === '/') {
     extension = '.html'
-  }
-  else {
+  } else {
     extension = path.extname(pathname.split('?')[0]) || '.html'
   }
 
@@ -79,7 +78,7 @@ const resourceTags = [
   { selector: 'script', attribute: 'src', type: 'script' },
 ]
 
-const validateOutputDirectory = (async outputDir) => {
+const validateOutputDirectory = async (outputDir) => {
   try {
     await fs.access(outputDir, fs.constants.F_OK)
   } catch {
@@ -156,7 +155,7 @@ const processHtml = async (html, baseUrl, resourcesDir, outputDir) => {
 
   await fs.mkdir(outputDir, { recursive: true })
 
-  const downloadPromises = resources.map(async resource => {
+  const downloadPromises = resources.map(async (resource) => {
     try {
       const localFileName = await downloadResource(resource.url, baseUrl, outputDir)
       const localPath = path.join(resourcesDir, localFileName)
