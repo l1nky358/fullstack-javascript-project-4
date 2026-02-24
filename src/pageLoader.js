@@ -192,7 +192,7 @@ const pageLoader = async (url, outputDir = process.cwd()) => {
     headers: {
       'User-Agent': 'Page-Loader/1.0.0',
     },
-  }).catch((error) => {
+  }).catch(error => {
     if (error.response) {
       throw new NetworkError(
         `Failed to load page: ${error.response.status} ${error.response.statusText}`,
