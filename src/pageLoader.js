@@ -50,7 +50,8 @@ const getLocalFileName = (resourceUrl, baseUrl) => {
   let extension
   if (pathname === '' || pathname === '/') {
     extension = '.html'
-  } else {
+  }
+  else {
     extension = path.extname(pathname.split('?')[0]) || '.html'
   }
 
@@ -66,7 +67,8 @@ const isLocalResource = (resourceUrl, pageUrl) => {
     const resourceFullUrl = new URL(resourceUrl, pageUrl)
     const pageHost = new URL(pageUrl).host
     return resourceFullUrl.host === pageHost
-  } catch {
+  }
+  catch {
     return false
   }
 }
@@ -90,7 +92,8 @@ const validateOutputDirectory = async (outputDir) => {
 
   try {
     await fs.access(outputDir, fs.constants.W_OK)
-  } catch {
+  }
+  catch {
     throw new FileSystemError(
       `No write permission for output directory: ${outputDir}`,
       'EACCES',
@@ -176,7 +179,8 @@ const pageLoader = async (url, outputDir = process.cwd()) => {
 
   try {
     new URL(url)
-  } catch {
+  }
+  catch {
     throw new PageLoaderError(
       `Invalid URL: ${url}. Please provide a valid URL including protocol (e.g., https://example.com)`,
       'INVALID_URL',
