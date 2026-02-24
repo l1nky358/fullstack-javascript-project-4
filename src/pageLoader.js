@@ -50,7 +50,8 @@ const getLocalFileName = (resourceUrl, baseUrl) => {
   let extension
   if (pathname === '' || pathname === '/') {
     extension = '.html'
-  } else {
+  }
+  else {
     extension = path.extname(pathname.split('?')[0]) || '.html'
   }
 
@@ -84,7 +85,7 @@ const validateOutputDirectory = async (outputDir) => {
   } catch {
     throw new FileSystemError(
       `Output directory does not exist: ${outputDir}`,
-      'ENOENT'
+      'ENOENT',
     )
   }
 
@@ -93,7 +94,7 @@ const validateOutputDirectory = async (outputDir) => {
   } catch {
     throw new FileSystemError(
       `No write permission for output directory: ${outputDir}`,
-      'EACCES'
+      'EACCES',
     )
   }
 
@@ -102,14 +103,14 @@ const validateOutputDirectory = async (outputDir) => {
     if (!stats.isDirectory()) {
       throw new FileSystemError(
         `Output path is not a directory: ${outputDir}`,
-        'ENOTDIR'
+        'ENOTDIR',
       )
     }
   } catch (error) {
     if (error.code !== 'ENOENT') {
       throw new FileSystemError(
         `Cannot access output directory: ${error.message}`,
-        error.code
+        error.code,
       )
     }
   }
@@ -122,9 +123,9 @@ const downloadResource = async (resourceUrl, baseUrl, outputDir) => {
 
   const response = await axios.get(fullUrl, {
     responseType: 'arraybuffer',
-    validateStatus: (status) => status >= 200 && status < 400,
+    validateStatus: status => status >= 200 && status < 400,
     timeout: 10000,
-    maxRedirects: 5
+    maxRedirects: 5,
   })
 
   await fs.writeFile(filePath, response.data)
@@ -143,7 +144,7 @@ const processHtml = async (html, baseUrl, resourcesDir, outputDir) => {
           url: attrValue,
           element: el,
           attribute,
-          type
+          type,
         })
       }
     })
@@ -155,7 +156,7 @@ const processHtml = async (html, baseUrl, resourcesDir, outputDir) => {
 
   await fs.mkdir(outputDir, { recursive: true })
 
-  const downloadPromises = resources.map(async (resource) => {
+  const downloadPromises = resources.map(async resource => {
     try {
       const localFileName = await downloadResource(resource.url, baseUrl, outputDir)
       const localPath = path.join(resourcesDir, localFileName)
@@ -179,48 +180,48 @@ const pageLoader = async (url, outputDir = process.cwd()) => {
   } catch {
     throw new PageLoaderError(
       `Invalid URL: ${url}. Please provide a valid URL including protocol (e.g., https://example.com)`,
-      'INVALID_URL'
+      'INVALID_URL',
     )
   }
 
   await validateOutputDirectory(outputDir)
 
   const response = await axios.get(url, {
-    validateStatus: (status) => status >= 200 && status < 400,
+    validateStatus: status => status >= 200 && status < 400,
     timeout: 30000,
     maxRedirects: 5,
     headers: {
-      'User-Agent': 'Page-Loader/1.0.0'
-    }
-  }).catch((error) => {
+      'User-Agent': 'Page-Loader/1.0.0',
+    },
+  }).catch(error => {
     if (error.response) {
       throw new NetworkError(
         `Failed to load page: ${error.response.status} ${error.response.statusText}`,
         'HTTP_ERROR',
-        error.response.status
+        error.response.status,
       )
     }
     if (error.code === 'ENOTFOUND') {
       throw new NetworkError(
         `Failed to load page - host not found: ${new URL(url).host}`,
-        'ENOTFOUND'
+        'ENOTFOUND',
       )
     }
     if (error.code === 'ECONNREFUSED') {
       throw new NetworkError(
         `Failed to load page - connection refused: ${new URL(url).host}`,
-        'ECONNREFUSED'
+        'ECONNREFUSED',
       )
     }
     if (error.code === 'ETIMEDOUT') {
       throw new NetworkError(
         `Failed to load page - timeout: ${url}`,
-        'ETIMEDOUT'
+        'ETIMEDOUT',
       )
     }
     throw new NetworkError(
       `Failed to load page: ${error.message}`,
-      'NETWORK_ERROR'
+      'NETWORK_ERROR',
     )
   })
 
@@ -233,7 +234,7 @@ const pageLoader = async (url, outputDir = process.cwd()) => {
     response.data,
     url,
     filesDirName,
-    filesDirPath
+    filesDirPath,
   )
 
   await fs.writeFile(htmlFilePath, modifiedHtml)
