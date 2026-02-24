@@ -19,6 +19,7 @@
     "listr2": "^6.6.1"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.9.0",
     "@vitest/coverage-v8": "^4.0.18",
     "nock": "^13.3.0",
     "vitest": "^4.0.18"
