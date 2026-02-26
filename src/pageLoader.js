@@ -137,3 +137,5 @@ const processHtml = async (html, baseUrl, resourcesDir, outputDir) => {
     })
   })
 }
+
+export default pageLoader;
