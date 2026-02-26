@@ -36,8 +36,8 @@ const generateFileName = (url) => {
   return urlWithoutProtocol.replace(/[^a-z0-9]/gi, '-')
 }
 
-const generateHtmlFileName = (url) => `${generateFileName(url)}.html`
-const generateFilesDirName = (url) => `${generateFileName(url)}_files`
+const generateHtmlFileName = url => `${generateFileName(url)}.html`
+const generateFilesDirName = url => `${generateFileName(url)}_files`
 
 const getLocalFileName = (resourceUrl, baseUrl) => {
   const fullUrl = new URL(resourceUrl, baseUrl).toString()
@@ -56,7 +56,7 @@ const getLocalFileName = (resourceUrl, baseUrl) => {
   }
 
   if (fileName.endsWith(extension.replace('.', '-'))) {
-    fileName = fileName.slice(0, -extension.length)
+    fileName = fileName.slice(0, -extension.length),
   }
 
   return `${fileName}${extension}`
@@ -67,7 +67,8 @@ const isLocalResource = (resourceUrl, pageUrl) => {
     const resourceFullUrl = new URL(resourceUrl, pageUrl)
     const pageHost = new URL(pageUrl).host
     return resourceFullUrl.host === pageHost
-  } catch {
+  }
+  catch {
     return false
   }
 }
@@ -76,13 +77,14 @@ const resourceTags = [
   { selector: 'img', attribute: 'src', type: 'image' },
   { selector: 'link[rel="stylesheet"]', attribute: 'href', type: 'stylesheet' },
   { selector: 'link[rel="canonical"]', attribute: 'href', type: 'canonical' },
-  { selector: 'script', attribute: 'src', type: 'script' }
+  { selector: 'script', attribute: 'src', type: 'script' },
 ]
 
 const validateOutputDirectory = async (outputDir) => {
   try {
     await fs.access(outputDir, fs.constants.F_OK)
-  } catch {
+  }
+  catch {
     throw new FileSystemError(
       `Output directory does not exist: ${outputDir}`,
       'ENOENT'
@@ -91,7 +93,8 @@ const validateOutputDirectory = async (outputDir) => {
 
   try {
     await fs.access(outputDir, fs.constants.W_OK)
-  } catch {
+  }
+  catch {
     throw new FileSystemError(
       `No write permission for output directory: ${outputDir}`,
       'EACCES'
