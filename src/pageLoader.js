@@ -122,7 +122,7 @@ const downloadResource = async (resourceUrl, baseUrl, outputDir) => {
 
   const response = await axios.get(fullUrl, {
     responseType: 'arraybuffer',
-    validateStatus: (status) => status >= 200 && status < 400,
+    validateStatus: status => status >= 200 && status < 400,
     timeout: 10000,
     maxRedirects: 5
   })
@@ -155,7 +155,7 @@ const processHtml = async (html, baseUrl, resourcesDir, outputDir) => {
 
   await fs.mkdir(outputDir, { recursive: true })
 
-  const downloadPromises = resources.map(async (resource) => {
+  const downloadPromises = resources.map(async resource => {
     try {
       const localFileName = await downloadResource(resource.url, baseUrl, outputDir)
       const localPath = path.join(resourcesDir, localFileName)
@@ -186,13 +186,13 @@ const pageLoader = async (url, outputDir = process.cwd()) => {
   await validateOutputDirectory(outputDir)
 
   const response = await axios.get(url, {
-    validateStatus: (status) => status >= 200 && status < 400,
+    validateStatus: status => status >= 200 && status < 400,
     timeout: 30000,
     maxRedirects: 5,
     headers: {
       'User-Agent': 'Page-Loader/1.0.0'
     }
-  }).catch((error) => {
+  }).catch(error => {
     if (error.response) {
       throw new NetworkError(
         `Failed to load page: ${error.response.status} ${error.response.statusText}`,
