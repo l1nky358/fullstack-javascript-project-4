@@ -77,7 +77,7 @@ const resourceTags = [
   { selector: 'img', attribute: 'src', type: 'image' },
   { selector: 'link[rel="stylesheet"]', attribute: 'href', type: 'stylesheet' },
   { selector: 'link[rel="canonical"]', attribute: 'href', type: 'canonical' },
-  { selector: 'script', attribute: 'src', type: 'script' },
+  { selector: 'script', attribute: 'src', type: 'script' }
 ]
 
 const validateOutputDirectory = async (outputDir) => {
