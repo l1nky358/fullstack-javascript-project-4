@@ -50,7 +50,8 @@ const getLocalFileName = (resourceUrl, baseUrl) => {
   let extension
   if (pathname === '' || pathname === '/') {
     extension = '.html'
-  } else {
+  }
+  else {
     extension = path.extname(pathname.split('?')[0]) || '.html'
   }
 
@@ -109,7 +110,7 @@ const validateOutputDirectory = async (outputDir) => {
     if (error.code !== 'ENOENT') {
       throw new FileSystemError(
         `Cannot access output directory: ${error.message}`,
-        error.code
+        error.code,
       )
     }
   }
