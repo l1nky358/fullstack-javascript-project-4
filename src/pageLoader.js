@@ -136,6 +136,98 @@ const processHtml = async (html, baseUrl, resourcesDir, outputDir) => {
       }
     })
   })
+
+  if (resources.length === 0) {
+    return $.html()
+  }
+
+  await fs.mkdir(outputDir, { recursive: true })
+
+  const downloadPromises = resources.map(async (resource) => {
+    try {
+      const localFileName = await downloadResource(resource.url, baseUrl, outputDir)
+      const localPath = path.join(resourcesDir, localFileName)
+      $(resource.element).attr(resource.attribute, localPath)
+      return { success: true, type: resource.type, url: resource.url }
+    } catch (error) {
+      logError(`Failed to download ${resource.type}: ${resource.url} - ${error.message}`)
+      return { success: false, type: resource.type, url: resource.url }
+    }
+  })
+
+  await Promise.all(downloadPromises)
+  return $.html()
 }
 
-export default pageLoader;
+const pageLoader = async (url, outputDir = process.cwd()) => {
+  log(`Starting page-loader for URL: ${url}`)
+
+  try {
+    new URL(url)
+  } catch {
+    throw new PageLoaderError(
+      `Invalid URL: ${url}. Please provide a valid URL including protocol (e.g., https://example.com)`,
+      'INVALID_URL'
+    )
+  }
+
+  await validateOutputDirectory(outputDir)
+
+  const response = await axios.get(url, {
+    validateStatus: (status) => status >= 200 && status < 400,
+    timeout: 30000,
+    maxRedirects: 5,
+    headers: {
+      'User-Agent': 'Page-Loader/1.0.0',
+    },
+  }).catch((error) => {
+    if (error.response) {
+      throw new NetworkError(
+        `Failed to load page: ${error.response.status} ${error.response.statusText}`,
+        'HTTP_ERROR',
+        error.response.status,
+      )
+    }
+    if (error.code === 'ENOTFOUND') {
+      throw new NetworkError(
+        `Failed to load page - host not found: ${new URL(url).host}`,
+        'ENOTFOUND',
+      )
+    }
+    if (error.code === 'ECONNREFUSED') {
+      throw new NetworkError(
+        `Failed to load page - connection refused: ${new URL(url).host}`,
+        'ECONNREFUSED',
+      )
+    }
+    if (error.code === 'ETIMEDOUT') {
+      throw new NetworkError(
+        `Failed to load page - timeout: ${url}`,
+        'ETIMEDOUT',
+      )
+    }
+    throw new NetworkError(
+      `Failed to load page: ${error.message}`,
+      'NETWORK_ERROR',
+    )
+  })
+
+  const htmlFileName = generateHtmlFileName(url)
+  const htmlFilePath = path.join(outputDir, htmlFileName)
+  const filesDirName = generateFilesDirName(url)
+  const filesDirPath = path.join(outputDir, filesDirName)
+
+  const modifiedHtml = await processHtml(
+    response.data,
+    url,
+    filesDirName,
+    filesDirPath,
+  )
+
+  await fs.writeFile(htmlFilePath, modifiedHtml)
+  log(`✓ Page saved: ${htmlFilePath}`)
+
+  return htmlFilePath
+}
+
+export default pageLoader
