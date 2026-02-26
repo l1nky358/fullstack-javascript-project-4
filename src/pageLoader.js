@@ -57,7 +57,7 @@ const getLocalFileName = (resourceUrl, baseUrl) => {
   }
 
   if (fileName.endsWith(extension.replace('.', '-'))) {
-    fileName = fileName.slice(0, -extension.length),
+    fileName = fileName.slice(0, -extension.length)
   }
 
   return `${fileName}${extension}`
