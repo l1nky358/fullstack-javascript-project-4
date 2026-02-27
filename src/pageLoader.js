@@ -51,7 +51,7 @@ const getLocalFileName = (resourceUrl, baseUrl) => {
 
   if (pathname === '' || pathname === '/') {
     extension = '.html'
-  } 
+  }
   else {
     extension = path.extname(pathname.split('?')[0]) || '.html'
   }
@@ -68,7 +68,7 @@ const isLocalResource = (resourceUrl, pageUrl) => {
     const resourceFullUrl = new URL(resourceUrl, pageUrl)
     const pageHost = new URL(pageUrl).host
     return resourceFullUrl.host === pageHost
-  } 
+  }
   catch {
     return false
   }
@@ -81,17 +81,17 @@ const resourceTags = [
   { selector: 'script', attribute: 'src', type: 'script' },
 ]
 
-const validateOutputDirectory = async outputDir => {
+const validateOutputDirectory = async (outputDir) => {
   try {
     await fs.access(outputDir, fs.constants.F_OK)
-  } 
+  }
   catch {
     throw new FileSystemError(`Output directory does not exist: ${outputDir}`, 'ENOENT')
   }
 
   try {
     await fs.access(outputDir, fs.constants.W_OK)
-  } 
+  }
   catch {
     throw new FileSystemError(`No write permission for output directory: ${outputDir}`, 'EACCES')
   }
@@ -101,7 +101,7 @@ const validateOutputDirectory = async outputDir => {
     if (!stats.isDirectory()) {
       throw new FileSystemError(`Output path is not a directory: ${outputDir}`, 'ENOTDIR')
     }
-  } 
+  }
   catch (error) {
     if (error.code !== 'ENOENT') {
       throw new FileSystemError(`Cannot access output directory: ${error.message}`, error.code)
@@ -149,13 +149,13 @@ const processHtml = async (html, baseUrl, resourcesDir, outputDir) => {
 
   await fs.mkdir(outputDir, { recursive: true })
 
-  const downloadPromises = resources.map(async resource => {
+  const downloadPromises = resources.map(async resource) => {
     try {
       const localFileName = await downloadResource(resource.url, baseUrl, outputDir)
       const localPath = path.join(resourcesDir, localFileName)
       $(resource.element).attr(resource.attribute, localPath)
       return { success: true, type: resource.type, url: resource.url }
-    } 
+    }
     catch (error) {
       logError(`Failed to download ${resource.type}: ${resource.url} - ${error.message}`)
       return { success: false, type: resource.type, url: resource.url }
@@ -171,7 +171,7 @@ const pageLoader = async (url, outputDir = process.cwd()) => {
 
   try {
     new URL(url)
-  } 
+  }
   catch {
     throw new PageLoaderError(
       `Invalid URL: ${url}. Please provide a valid URL including protocol (e.g., https://example.com)`,
@@ -188,7 +188,7 @@ const pageLoader = async (url, outputDir = process.cwd()) => {
     headers: {
       'User-Agent': 'Page-Loader/1.0.0',
     },
-  }).catch(error => {
+  }).catch(error) => {
     if (error.response) {
       throw new NetworkError(
         `Failed to load page: ${error.response.status} ${error.response.statusText}`,
