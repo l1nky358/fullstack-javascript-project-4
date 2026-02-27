@@ -36,8 +36,8 @@ const generateFileName = (url) => {
   return urlWithoutProtocol.replace(/[^a-z0-9]/gi, '-')
 }
 
-const generateHtmlFileName = (url) => `${generateFileName(url)}.html`
-const generateFilesDirName = (url) => `${generateFileName(url)}_files`
+const generateHtmlFileName = url => `${generateFileName(url)}.html`
+const generateFilesDirName = url => `${generateFileName(url)}_files`
 
 const getLocalFileName = (resourceUrl, baseUrl) => {
   const fullUrl = new URL(resourceUrl, baseUrl).toString()
@@ -51,7 +51,7 @@ const getLocalFileName = (resourceUrl, baseUrl) => {
 
   if (pathname === '' || pathname === '/') {
     extension = '.html'
-  } 
+  }
   else {
     extension = path.extname(pathname.split('?')[0]) || '.html'
   }
@@ -68,7 +68,7 @@ const isLocalResource = (resourceUrl, pageUrl) => {
     const resourceFullUrl = new URL(resourceUrl, pageUrl)
     const pageHost = new URL(pageUrl).host
     return resourceFullUrl.host === pageHost
-  } 
+  }
   catch {
     return false
   }
@@ -84,14 +84,14 @@ const resourceTags = [
 const validateOutputDirectory = async (outputDir) => {
   try {
     await fs.access(outputDir, fs.constants.F_OK)
-  } 
+  }
   catch {
     throw new FileSystemError(`Output directory does not exist: ${outputDir}`, 'ENOENT')
   }
 
   try {
     await fs.access(outputDir, fs.constants.W_OK)
-  } 
+  }
   catch {
     throw new FileSystemError(`No write permission for output directory: ${outputDir}`, 'EACCES')
   }
@@ -101,7 +101,7 @@ const validateOutputDirectory = async (outputDir) => {
     if (!stats.isDirectory()) {
       throw new FileSystemError(`Output path is not a directory: ${outputDir}`, 'ENOTDIR')
     }
-  } 
+  }
   catch (error) {
     if (error.code !== 'ENOENT') {
       throw new FileSystemError(`Cannot access output directory: ${error.message}`, error.code)
@@ -116,7 +116,7 @@ const downloadResource = async (resourceUrl, baseUrl, outputDir) => {
 
   const response = await axios.get(fullUrl, {
     responseType: 'arraybuffer',
-    validateStatus: (status) => status >= 200 && status < 400,
+    validateStatus: status => status >= 200 && status < 400,
     timeout: 10000,
     maxRedirects: 5,
   })
@@ -155,7 +155,7 @@ const processHtml = async (html, baseUrl, resourcesDir, outputDir) => {
       const localPath = path.join(resourcesDir, localFileName)
       $(resource.element).attr(resource.attribute, localPath)
       return { success: true, type: resource.type, url: resource.url }
-    } 
+    }
     catch (error) {
       logError(`Failed to download ${resource.type}: ${resource.url} - ${error.message}`)
       return { success: false, type: resource.type, url: resource.url }
@@ -171,18 +171,18 @@ const pageLoader = async (url, outputDir = process.cwd()) => {
 
   try {
     new URL(url)
-  } 
+  }
   catch {
     throw new PageLoaderError(
       `Invalid URL: ${url}. Please provide a valid URL including protocol (e.g., https://example.com)`,
-      'INVALID_URL'
+      'INVALID_URL',
     )
   }
 
   await validateOutputDirectory(outputDir)
 
   const response = await axios.get(url, {
-    validateStatus: (status) => status >= 200 && status < 400,
+    validateStatus: status => status >= 200 && status < 400,
     timeout: 30000,
     maxRedirects: 5,
     headers: {
