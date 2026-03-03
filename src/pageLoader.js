@@ -51,7 +51,7 @@ const getLocalFileName = (resourceUrl, baseUrl) => {
 
   if (pathname === '' || pathname === '/') {
     extension = '.html'
-  }
+  } 
   else {
     extension = path.extname(pathname.split('?')[0]) || '.html'
   }
@@ -68,7 +68,7 @@ const isLocalResource = (resourceUrl, pageUrl) => {
     const resourceFullUrl = new URL(resourceUrl, pageUrl)
     const pageHost = new URL(pageUrl).host
     return resourceFullUrl.host === pageHost
-  }
+  } 
   catch {
     return false
   }
@@ -81,51 +81,44 @@ const resourceTags = [
   { selector: 'script', attribute: 'src', type: 'script' },
 ]
 
-const validateOutputDirectory = async (outputDir) => {
-  try {
-    await fs.access(outputDir, fs.constants.F_OK)
-  }
-  catch {
-    throw new FileSystemError(`Output directory does not exist: ${outputDir}`, 'ENOENT')
-  }
-
-  try {
-    await fs.access(outputDir, fs.constants.W_OK)
-  }
-  catch {
-    throw new FileSystemError(`No write permission for output directory: ${outputDir}`, 'EACCES')
-  }
-
-  try {
-    const stats = await fs.stat(outputDir)
-    if (!stats.isDirectory()) {
-      throw new FileSystemError(`Output path is not a directory: ${outputDir}`, 'ENOTDIR')
-    }
-  }
-  catch (error) {
-    if (error.code !== 'ENOENT') {
-      throw new FileSystemError(`Cannot access output directory: ${error.message}`, error.code)
-    }
-  }
+const validateOutputDirectory = (outputDir) => {
+  return fs.access(outputDir, fs.constants.F_OK)
+    .catch(() => {
+      throw new FileSystemError(`Output directory does not exist: ${outputDir}`, 'ENOENT')
+    })
+    .then(() => fs.access(outputDir, fs.constants.W_OK))
+    .catch(() => {
+      throw new FileSystemError(`No write permission for output directory: ${outputDir}`, 'EACCES')
+    })
+    .then(() => fs.stat(outputDir))
+    .then((stats) => {
+      if (!stats.isDirectory()) {
+        throw new FileSystemError(`Output path is not a directory: ${outputDir}`, 'ENOTDIR')
+      }
+    })
+    .catch((error) => {
+      if (error.code !== 'ENOENT') {
+        throw new FileSystemError(`Cannot access output directory: ${error.message}`, error.code)
+      }
+    })
 }
 
-const downloadResource = async (resourceUrl, baseUrl, outputDir) => {
+const downloadResource = (resourceUrl, baseUrl, outputDir) => {
   const fullUrl = new URL(resourceUrl, baseUrl).toString()
   const fileName = getLocalFileName(resourceUrl, baseUrl)
   const filePath = path.join(outputDir, fileName)
 
-  const response = await axios.get(fullUrl, {
+  return axios.get(fullUrl, {
     responseType: 'arraybuffer',
     validateStatus: status => status >= 200 && status < 400,
     timeout: 10000,
     maxRedirects: 5,
   })
-
-  await fs.writeFile(filePath, response.data)
-  return fileName
+    .then((response) => fs.writeFile(filePath, response.data))
+    .then(() => fileName)
 }
 
-const processHtml = async (html, baseUrl, resourcesDir, outputDir) => {
+const processHtml = (html, baseUrl, resourcesDir, outputDir) => {
   const $ = cheerio.load(html)
   const resources = []
 
@@ -144,98 +137,101 @@ const processHtml = async (html, baseUrl, resourcesDir, outputDir) => {
   })
 
   if (resources.length === 0) {
-    return $.html()
+    return Promise.resolve($.html())
   }
 
-  await fs.mkdir(outputDir, { recursive: true })
+  return fs.mkdir(outputDir, { recursive: true })
+    .then(() => {
+      const downloadPromises = resources.map((resource) => {
+        return downloadResource(resource.url, baseUrl, outputDir)
+          .then((localFileName) => {
+            const localPath = path.join(resourcesDir, localFileName)
+            $(resource.element).attr(resource.attribute, localPath)
+            return { success: true, type: resource.type, url: resource.url }
+          })
+          .catch((error) => {
+            logError(`Failed to download ${resource.type}: ${resource.url} - ${error.message}`)
+            return { success: false, type: resource.type, url: resource.url }
+          })
+      })
 
-  const downloadPromises = resources.map(async (resource) => {
-    try {
-      const localFileName = await downloadResource(resource.url, baseUrl, outputDir)
-      const localPath = path.join(resourcesDir, localFileName)
-      $(resource.element).attr(resource.attribute, localPath)
-      return { success: true, type: resource.type, url: resource.url }
-    }
-    catch (error) {
-      logError(`Failed to download ${resource.type}: ${resource.url} - ${error.message}`)
-      return { success: false, type: resource.type, url: resource.url }
-    }
-  })
-
-  await Promise.all(downloadPromises)
-  return $.html()
+      return Promise.all(downloadPromises)
+        .then(() => $.html())
+    })
 }
 
-const pageLoader = async (url, outputDir = process.cwd()) => {
+const pageLoader = (url, outputDir = process.cwd()) => {
   log(`Starting page-loader for URL: ${url}`)
 
+  let urlObj
   try {
-    new URL(url)
-  }
+    urlObj = new URL(url)
+  } 
   catch {
-    throw new PageLoaderError(
+    return Promise.reject(new PageLoaderError(
       `Invalid URL: ${url}. Please provide a valid URL including protocol (e.g., https://example.com)`,
       'INVALID_URL',
-    )
+    ))
   }
 
-  await validateOutputDirectory(outputDir)
-
-  const response = await axios.get(url, {
-    validateStatus: status => status >= 200 && status < 400,
-    timeout: 30000,
-    maxRedirects: 5,
-    headers: {
-      'User-Agent': 'Page-Loader/1.0.0',
-    },
-  }).catch((error) => {
-    if (error.response) {
+  return validateOutputDirectory(outputDir)
+    .then(() => axios.get(url, {
+      validateStatus: status => status >= 200 && status < 400,
+      timeout: 30000,
+      maxRedirects: 5,
+      headers: {
+        'User-Agent': 'Page-Loader/1.0.0',
+      },
+    }))
+    .catch((error) => {
+      if (error.response) {
+        throw new NetworkError(
+          `Failed to load page: ${error.response.status} ${error.response.statusText}`,
+          'HTTP_ERROR',
+          error.response.status,
+        )
+      }
+      if (error.code === 'ENOTFOUND') {
+        throw new NetworkError(
+          `Failed to load page - host not found: ${urlObj.host}`,
+          'ENOTFOUND',
+        )
+      }
+      if (error.code === 'ECONNREFUSED') {
+        throw new NetworkError(
+          `Failed to load page - connection refused: ${urlObj.host}`,
+          'ECONNREFUSED',
+        )
+      }
+      if (error.code === 'ETIMEDOUT') {
+        throw new NetworkError(
+          `Failed to load page - timeout: ${url}`,
+          'ETIMEDOUT',
+        )
+      }
       throw new NetworkError(
-        `Failed to load page: ${error.response.status} ${error.response.statusText}`,
-        'HTTP_ERROR',
-        error.response.status,
+        `Failed to load page: ${error.message}`,
+        'NETWORK_ERROR',
       )
-    }
-    if (error.code === 'ENOTFOUND') {
-      throw new NetworkError(
-        `Failed to load page - host not found: ${new URL(url).host}`,
-        'ENOTFOUND',
+    })
+    .then((response) => {
+      const htmlFileName = generateHtmlFileName(url)
+      const htmlFilePath = path.join(outputDir, htmlFileName)
+      const filesDirName = generateFilesDirName(url)
+      const filesDirPath = path.join(outputDir, filesDirName)
+
+      return processHtml(
+        response.data,
+        url,
+        filesDirName,
+        filesDirPath,
       )
-    }
-    if (error.code === 'ECONNREFUSED') {
-      throw new NetworkError(
-        `Failed to load page - connection refused: ${new URL(url).host}`,
-        'ECONNREFUSED',
-      )
-    }
-    if (error.code === 'ETIMEDOUT') {
-      throw new NetworkError(
-        `Failed to load page - timeout: ${url}`,
-        'ETIMEDOUT',
-      )
-    }
-    throw new NetworkError(
-      `Failed to load page: ${error.message}`,
-      'NETWORK_ERROR',
-    )
-  })
-
-  const htmlFileName = generateHtmlFileName(url)
-  const htmlFilePath = path.join(outputDir, htmlFileName)
-  const filesDirName = generateFilesDirName(url)
-  const filesDirPath = path.join(outputDir, filesDirName)
-
-  const modifiedHtml = await processHtml(
-    response.data,
-    url,
-    filesDirName,
-    filesDirPath,
-  )
-
-  await fs.writeFile(htmlFilePath, modifiedHtml)
-  log(`✓ Page saved: ${htmlFilePath}`)
-
-  return htmlFilePath
+        .then((modifiedHtml) => fs.writeFile(htmlFilePath, modifiedHtml))
+        .then(() => {
+          log(`✓ Page saved: ${htmlFilePath}`)
+          return htmlFilePath
+        })
+    })
 }
 
 export default pageLoader
