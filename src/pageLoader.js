@@ -51,7 +51,7 @@ const getLocalFileName = (resourceUrl, baseUrl) => {
 
   if (pathname === '' || pathname === '/') {
     extension = '.html'
-  } 
+  }
   else {
     extension = path.extname(pathname.split('?')[0]) || '.html'
   }
@@ -68,7 +68,7 @@ const isLocalResource = (resourceUrl, pageUrl) => {
     const resourceFullUrl = new URL(resourceUrl, pageUrl)
     const pageHost = new URL(pageUrl).host
     return resourceFullUrl.host === pageHost
-  } 
+  }
   catch {
     return false
   }
@@ -114,7 +114,7 @@ const downloadResource = (resourceUrl, baseUrl, outputDir) => {
     timeout: 10000,
     maxRedirects: 5,
   })
-    .then((response) => fs.writeFile(filePath, response.data))
+    .then(response => fs.writeFile(filePath, response.data))
     .then(() => fileName)
 }
 
@@ -166,7 +166,7 @@ const pageLoader = (url, outputDir = process.cwd()) => {
   let urlObj
   try {
     urlObj = new URL(url)
-  } 
+  }
   catch {
     return Promise.reject(new PageLoaderError(
       `Invalid URL: ${url}. Please provide a valid URL including protocol (e.g., https://example.com)`,
@@ -226,7 +226,7 @@ const pageLoader = (url, outputDir = process.cwd()) => {
         filesDirName,
         filesDirPath,
       )
-        .then((modifiedHtml) => fs.writeFile(htmlFilePath, modifiedHtml))
+        .then(modifiedHtml => fs.writeFile(htmlFilePath, modifiedHtml))
         .then(() => {
           log(`✓ Page saved: ${htmlFilePath}`)
           return htmlFilePath
